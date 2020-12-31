@@ -1,5 +1,6 @@
 class _Getch:
 
+
     def __init__(self):
         try:
             self.impl = getch_windows()

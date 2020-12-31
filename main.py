@@ -8,6 +8,7 @@ if __name__ == '__main__':
 
     my_server = True
     my_client = False
+
     if my_server:
         #server
         # tcp thread handler

@@ -7,6 +7,7 @@ import config
 from getch import _Getch
 
 
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -34,6 +35,7 @@ class bcolors:
     F_LightMagenta = "\x1b[95m"
     F_LightCyan = "\x1b[96m"
     F_White = "\x1b[97m"
+
 
 def receving_udp_mess():
     UDP_IP = config.get_udp_ip_client()

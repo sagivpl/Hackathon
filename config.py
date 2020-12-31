@@ -1,16 +1,18 @@
+from scapy.arch import get_if_addr
+
 BUFFER_SIZE = 100000
 
-TCP_IP_SERVER = "192.168.1.14"
-TCP_IP_CLIENT = "0000"
+TCP_IP_SERVER = get_if_addr('eth1')
+TCP_IP_CLIENT = ""
 
 UDP_IP_SERVER = '255.255.255.255'
 UDP_IP_CLIENT = "0.0.0.0"
 
-TCP_PORT_SERVER = "5005"
-TCP_PORT_CLIENT = "0000"
+TCP_PORT_SERVER = "0"
+TCP_PORT_CLIENT = "0"
 
-UDP_PORT_SERVER = "5005"
-UDP_PORT_CLIENT = "5005"
+UDP_PORT_SERVER = "0"
+UDP_PORT_CLIENT = "0"
 
 def get_tcp_ip_server():
     return TCP_IP_SERVER
