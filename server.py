@@ -41,7 +41,6 @@ def create_welcome_massage(my_group):
         massage += str(group) + '\n'
     return massage
 
-
 def create_win_massage(my_group):
     my_group_sorted = {k: v for k, v in sorted(my_group.group_keyboard_dict.items(), key=lambda item: item[0])}
     my_group_sorted_names = {k: v for k, v in sorted(my_group.group_name_dict.items(), key=lambda item: item[0])}
