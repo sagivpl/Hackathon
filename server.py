@@ -1,99 +1,11 @@
-# import socket
-# import struct
-#
-# from scapy.all import*
-#
-# def receving_udp_mess():
-#     host_config = []
-#     UDP_IP = "0.0.0.0"
-#     UDP_PORT = 13117
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-#     sock.bind((UDP_IP, UDP_PORT))
-#     # while True:
-#     data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
-#     print("received message: %s" % data)
-#     if not (data[:4] == bytes([0xfe, 0xed, 0xbe, 0xef])) or not (data[4] == 0x02):
-#         print("Invalid format.")
-#     host_ip = addr[0]
-#     port_host = struct.unpack('>H', data[5:7])[0]
-#     host_config.append(host_ip)
-#     host_config.append(port_host)
-#     return host_config
-#
-#
-#
-# def receving_tcp_mess():
-#     # TCP_IP =  get_if_addr('eth1')
-#     print('sagiv')
-#     TCP_IP = '10.100.102.15'
-#     TCP_PORT = 5005
-#     BUFFER_SIZE = 100000  # Normally 1024, but we want fast response
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.bind((TCP_IP, TCP_PORT))
-#     s.listen(1)
-#     conn, addr = s.accept()
-#     print('Connection address:', addr)
-#     while 1:
-#         data = conn.recv(BUFFER_SIZE)
-#         if not data:
-#             break
-#         print("received data:", data.decode('utf_8'))
-#         data = data.decode('utf_8')
-#         # print(data)
-#         data = data.split('\n')
-#         data_dict = {data[0]: data[1]}
-#         print(data_dict)
-#         conn.send('ok'.encode('utf_8'))  # echo
-#     # conn.close()
-
-import socket
-
-# def receving_udp_mess():
-#     UDP_IP = "10.100.102.4"
-#     UDP_PORT = 5005
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-#     sock.bind((UDP_IP, UDP_PORT))
-#     while True:
-#         data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
-#         print("received message: %s" % data)
-
-
-
-# def receving_tcp_mess():
-#     TCP_IP = "10.100.102.11"
-#     TCP_PORT = 5005
-#     BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
-#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     s.bind((TCP_IP, TCP_PORT))
-#     s.listen(1)
-#     conn, addr = s.accept()
-#     print('Connection address:', addr)
-#     while 1:
-#         data = conn.recv(BUFFER_SIZE)
-#         if not data:
-#             break
-#         print("received data:", data.decode('utf_8'))
-#         data = data.decode('utf_8')
-#         # print(data)
-#         data = data.split('\n')
-#         data_dict = {data[0]: data[1]}
-#         print(data_dict)
-#         conn.send('ok'.encode('utf_8'))  # echo
-    # conn.close()
-
-
-import client
-import server
-import concurrent.futures
+import struct
 import time
-import threading
 from threading import *
-import socket
 import traceback
 import sys
 from socket import *
 import socket
-import config
+
 class group():
     group_name_dict = {}
     group_keyboard_dict = {}
@@ -139,7 +51,8 @@ def create_win_massage(my_group):
     group_2 = []
     group_2.append(0)
     group_2_name = []
-
+    total_press_1 = 0
+    total_press_2 = 0
     for key, value in my_group_sorted.items():
         if i % 2 == 0:
             group_1.append(value)
@@ -154,10 +67,16 @@ def create_win_massage(my_group):
             group_2_name.append(value)
         i += 1
 
+    for val in group_1:
+        total_press_1+=val
+
+    for val in group_2:
+        total_press_2+=val
+
     massage = 'Game over!\n' \
-              'Group 1 typed in ' + str(group_1[0]) + ' characters. Group 2 typed in ' + str(
-        group_2[0]) + ' characters.\n'
-    if len(group_1) > len(group_2):
+              'Group 1 typed in ' + str(total_press_1) + ' characters. Group 2 typed in ' +  str(total_press_2) + ' characters.\n'
+
+    if total_press_1 > total_press_2:
 
         massage += 'Group 1 wins!\n\n' \
                    'Congratulations to the winners:\n==\n'
@@ -194,33 +113,41 @@ def udp_thread_handler():
 
 def sending_udp_mess():
     # UDP_IP = "192.168.1.23"
-    UDP_IP = config.get_udp_ip_server()
+    # UDP_IP = config.get_udp_ip_server()
+    UDP_IP = '192.168.43.148'
     print('UDP_IP', UDP_IP)
     UDP_PORT = 5005
     #sending
-    MESSAGE = ('0xfeedbeef'+'0x2'+str(UDP_PORT))
-    MESSAGE = bytes(MESSAGE,'utf-8')
-
+    # MESSAGE = ('0xfeedbeef'+'0x2'+str(UDP_PORT))
+    # MESSAGE = bytes(MESSAGE,'utf-8')
+    frame = [0xfe, 0xed, 0xbe, 0xef]
+    type = [0x02]
+    s = struct.pack('>H', UDP_PORT)
+    msg = bytes(frame) + bytes(type) + bytes(s)
     sock = socket.socket(socket.AF_INET, # Internet
                          socket.SOCK_DGRAM) # UDP
-    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    sock.sendto(msg, (UDP_IP, UDP_PORT))
 
-    cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    try:
-        cs.sendto(MESSAGE, ('255.255.255.255', UDP_PORT))
-        # sock = socket.socket(socket.AF_INET,  # Internet
-        #                      socket.SOCK_DGRAM)  # UDP
-        # sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    # cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # try:
+    #     cs.sendto(MESSAGE, ('255.255.255.255', UDP_PORT))
+    #     sock = socket.socket(socket.AF_INET,  # Internet
+    #                          socket.SOCK_DGRAM)  # UDP
+    #     sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    #
+    # except:
+    #     pass
 
-    except:
-        pass
 
+def spma_mode(start_time):
+    while (time.time() - start_time) % 60 < 10:
+        continue
 
 def start_server():
     my_group = group()
-    TCP_IP = "192.168.1.14"
+    TCP_IP = '192.168.43.63'
     TCP_PORT = 5005  # arbitrary non-privileged port
     BUFFER_SIZE = 100000
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -251,7 +178,7 @@ def start_server():
         # break
         try:
             print('Thread create' + str(j))
-            new_thread = Thread(target=client_thread,
+            new_thread = Thread(target=game_mode,
                                 args=(connection, ip, TCP_PORT, BUFFER_SIZE, my_group, start_time)).start()
             threads.append(new_thread)
         except:
@@ -261,7 +188,7 @@ def start_server():
     soc.close()
 
 
-def client_thread(connection, ip, port, max_buffer_size, my_group, start_time):
+def game_mode(connection, ip, port, max_buffer_size, my_group, start_time):
     print('thread  ' + ip)
     is_active = True
     num = 1
@@ -280,10 +207,8 @@ def client_thread(connection, ip, port, max_buffer_size, my_group, start_time):
         elif num == 2 and len(client_input) > 0:
             start_time = time.time()
             my_group.add_to_keyboard_dict(ip, len(client_input))
-            while (time.time() - start_time) % 60 < 10:
-                continue
+            spma_mode(start_time)
             massage = create_win_massage(my_group)
-            # massage = 'len: ' + str(len(client_input))
             connection.sendall(massage.encode("utf_8"))
             connection.close()
             is_active = False
