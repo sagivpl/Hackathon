@@ -6,6 +6,9 @@ import sys
 from socket import *
 import socket
 
+import config
+
+
 class group():
     group_name_dict = {}
     group_keyboard_dict = {}
@@ -113,32 +116,27 @@ def udp_thread_handler():
 
 def sending_udp_mess():
     # UDP_IP = "192.168.1.23"
-    # UDP_IP = config.get_udp_ip_server()
-    UDP_IP = '192.168.43.148'
-    print('UDP_IP', UDP_IP)
-    UDP_PORT = 5005
+    UDP_IP = config.get_udp_ip_server()
+    print("Server started,listening on IP address" + UDP_IP)
+    UDP_PORT = config.get_udp_port_server()
     #sending
-    # MESSAGE = ('0xfeedbeef'+'0x2'+str(UDP_PORT))
-    # MESSAGE = bytes(MESSAGE,'utf-8')
     frame = [0xfe, 0xed, 0xbe, 0xef]
     type = [0x02]
     s = struct.pack('>H', UDP_PORT)
     msg = bytes(frame) + bytes(type) + bytes(s)
-    sock = socket.socket(socket.AF_INET, # Internet
-                         socket.SOCK_DGRAM) # UDP
-    sock.sendto(msg, (UDP_IP, UDP_PORT))
+    # sock = socket.socket(socket.AF_INET, # Internet
+    #                      socket.SOCK_DGRAM) # UDP
+    # sock.sendto(msg, (UDP_IP, UDP_PORT))
 
-    # cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    # try:
-    #     cs.sendto(MESSAGE, ('255.255.255.255', UDP_PORT))
-    #     sock = socket.socket(socket.AF_INET,  # Internet
-    #                          socket.SOCK_DGRAM)  # UDP
-    #     sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-    #
-    # except:
-    #     pass
+    cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    try:
+        cs.sendto(msg, (UDP_IP, UDP_PORT))
+        sock = socket.socket(socket.AF_INET,  # Internet
+                             socket.SOCK_DGRAM)  # UDP
+    except:
+        pass
 
 
 def spma_mode(start_time):

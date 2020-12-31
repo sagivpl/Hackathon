@@ -44,7 +44,6 @@ def receving_udp_mess():
         # data = data.decode('utf_8')
         if not (data[:4] == bytes([0xfe, 0xed, 0xbe, 0xef])) or not (data[4] == 0x02):
             print("Invalid format.")
-
         print("received message: %s" % data)
         ip_server = addr[0]
         port_server = struct.unpack('>H', data[5:7])[0]
