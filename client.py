@@ -1,9 +1,9 @@
-# import socket
-# import time
-#
-# # import getch
-# # from socket import*
-# from msvcrt import getch
+import socket
+import time
+
+# import getch
+from socket import*
+from msvcrt import getch
 #
 #
 # class bcolors:
@@ -74,21 +74,42 @@
 #     data = s.recv(BUFFER_SIZE)
 #     print(bcolors.F_LightYellow+"receiving data:", data.decode('utf_8'))
 #     s.close()
-
+from socket import *
 import socket
 
-def sending_udp_mess(UDP_IP):
-    # UDP_IP = "10.100.102.4"
+def sending_udp_mess():
+    UDP_IP = "255.255.255.255"
     UDP_PORT = 5005
     #sending
     # MESSAGE = bytes(0xfeedbeef)+bytes(0x2)+bytes(UDP_PORT)
     MESSAGE = ('0xfeedbeef'+'0x2'+str(UDP_PORT)).encode('utf_8')
+    MESSAGE = bytes(MESSAGE)
     # print("UDP target IP: %s" % UDP_IP)
     # print("UDP target port: %s" % UDP_PORT)
     # print("message: %s" % MESSAGE.decode('utf_8'))
-    sock = socket.socket(socket.AF_INET, # Internet
-                         socket.SOCK_DGRAM) # UDP
-    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    # sock = socket.socket(socket.AF_INET, # Internet
+    #                      socket.SOCK_DGRAM) # UDP
+    # sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    # cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # cs = socket(AF_INET, SOCK_DGRAM)
+    # cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    # cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+    # cs.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
+    # sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    # sock.close()
+
+    cs = socket(AF_INET, SOCK_DGRAM)
+    cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    try:
+        cs.sendto(MESSAGE, ("255.255.255.255", UDP_PORT))
+        cs.sendto(MESSAGE, ("255.255.255.255", UDP_PORT))
+    except:
+        pass
 
 
 def sending_tcp_mess():
