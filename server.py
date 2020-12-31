@@ -110,14 +110,11 @@ def sending_udp_mess():
     type = [0x02]
     s = struct.pack('>H', UDP_PORT)
     msg = bytes(frame) + bytes(type) + bytes(s)
-
-
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     try:
         cs.sendto(msg, (UDP_IP, UDP_PORT))
-
     except:
         pass
 
@@ -147,8 +144,6 @@ def start_server():
     start_time = time.time()
     j = 1
     while (time.time() - start_time) % 60 < 10:
-
-        # print('accept')
         try:
             connection, address = soc.accept()
             print('after connection' + str(j))
@@ -156,7 +151,6 @@ def start_server():
             print("Connected with " + ip + ":" + TCP_PORT)
         except:
             break
-        # break
         try:
             print('Thread create' + str(j))
             new_thread = Thread(target=game_mode,
@@ -173,8 +167,11 @@ def game_mode(connection, ip, port, max_buffer_size, my_group, start_time):
     is_active = True
     num = 1
     while is_active:
-        client_input = receive_input(connection, max_buffer_size)
-        print('data from client  ', client_input)
+        try:
+            client_input = receive_input(connection, max_buffer_size)
+        except:
+            print("error client input not receive.")
+            traceback.print_exc()
         if num == 1:
             group_name = client_input.split('\n')
             my_group.add_to_name_dict(ip, group_name[0])
