@@ -5,7 +5,6 @@ import traceback
 import sys
 from socket import *
 import socket
-
 import config
 
 
@@ -46,7 +45,6 @@ def create_welcome_massage(my_group):
 def create_win_massage(my_group):
     my_group_sorted = {k: v for k, v in sorted(my_group.group_keyboard_dict.items(), key=lambda item: item[0])}
     my_group_sorted_names = {k: v for k, v in sorted(my_group.group_name_dict.items(), key=lambda item: item[0])}
-
     i = 0
     group_1 = []
     group_1.append(0)
@@ -97,25 +95,13 @@ def create_win_massage(my_group):
 def udp_thread_handler():
     print('send server port')
     # send server port
-    num_of_threads = 1
     start_time = time.time()
     while (time.time() - start_time) % 60 < 10:
-        # client.sending_udp_mess("192.168.1.22")
-        # client.sending_udp_mess("192.168.1.23")
         sending_udp_mess()
-        # with concurrent.futures.ThreadPoolExecutor(max_workers=num_of_threads) as executor:
-        #     executor.submit(udp_thread_handler)
-        # executor.shutdown()
-        # print('sleep')
         time.sleep(1)
-
-    # print('receving the team name')
-    # receving the team name
-    # server.receving_tcp_mess()
 
 
 def sending_udp_mess():
-    # UDP_IP = "192.168.1.23"
     UDP_IP = config.get_udp_ip_server()
     print("Server started,listening on IP address" + UDP_IP)
     UDP_PORT = config.get_udp_port_server()
@@ -124,17 +110,14 @@ def sending_udp_mess():
     type = [0x02]
     s = struct.pack('>H', UDP_PORT)
     msg = bytes(frame) + bytes(type) + bytes(s)
-    # sock = socket.socket(socket.AF_INET, # Internet
-    #                      socket.SOCK_DGRAM) # UDP
-    # sock.sendto(msg, (UDP_IP, UDP_PORT))
+
 
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     try:
         cs.sendto(msg, (UDP_IP, UDP_PORT))
-        sock = socket.socket(socket.AF_INET,  # Internet
-                             socket.SOCK_DGRAM)  # UDP
+
     except:
         pass
 
@@ -145,9 +128,9 @@ def spma_mode(start_time):
 
 def start_server():
     my_group = group()
-    TCP_IP = '192.168.43.63'
-    TCP_PORT = 5005  # arbitrary non-privileged port
-    BUFFER_SIZE = 100000
+    TCP_IP = config.get_tcp_ip_server()
+    TCP_PORT = config.get_tcp_port_server()  # arbitrary non-privileged port
+    BUFFER_SIZE = config.get_buffer_size()
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     threads = []
@@ -187,7 +170,6 @@ def start_server():
 
 
 def game_mode(connection, ip, port, max_buffer_size, my_group, start_time):
-    print('thread  ' + ip)
     is_active = True
     num = 1
     while is_active:
@@ -196,7 +178,6 @@ def game_mode(connection, ip, port, max_buffer_size, my_group, start_time):
         if num == 1:
             group_name = client_input.split('\n')
             my_group.add_to_name_dict(ip, group_name[0])
-            current_time = time.time()
             num += 1
             while (time.time() - start_time) % 60 < 10:
                 continue
@@ -218,5 +199,4 @@ def receive_input(connection, max_buffer_size):
     if client_input_size > max_buffer_size:
         print("The input size is greater than expected {}".format(client_input_size))
     decoded_input = client_input.decode("utf8")
-    # result = process_input(decoded_input)
     return str(decoded_input)

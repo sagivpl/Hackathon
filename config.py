@@ -1,4 +1,4 @@
-
+BUFFER_SIZE = 100000
 
 TCP_IP_SERVER = "192.168.1.14"
 TCP_IP_CLIENT = "0000"
@@ -35,3 +35,6 @@ def get_udp_port_server():
 
 def get_udp_port_client():
     return UDP_PORT_CLIENT
+
+def get_buffer_size():
+    return BUFFER_SIZE

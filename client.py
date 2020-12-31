@@ -2,6 +2,8 @@ import msvcrt
 import socket
 import struct
 import time
+
+import config
 from getch import _Getch
 
 
@@ -34,13 +36,13 @@ class bcolors:
     F_White = "\x1b[97m"
 
 def receving_udp_mess():
-    # UDP_IP = "192.168.1.23"
-    UDP_IP = "0.0.0.0"
-    UDP_PORT = 5005
+    UDP_IP = config.get_udp_ip_client()
+    UDP_PORT = config.get_udp_port_client()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     sock.bind((UDP_IP, UDP_PORT))
+    BUFFER_SIZE = config.get_buffer_size()
     while True:
-        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
+        data, addr = sock.recvfrom(BUFFER_SIZE)  # buffer size is 1024 bytes
         # data = data.decode('utf_8')
         if not (data[:4] == bytes([0xfe, 0xed, 0xbe, 0xef])) or not (data[4] == 0x02):
             print("Invalid format.")
@@ -50,24 +52,8 @@ def receving_udp_mess():
         return [ip_server, port_server]
 
 
-
-def sending_udp_mess(UDP_IP):
-    # UDP_IP = "10.100.102.11"
-    UDP_PORT = 5005
-    #sending
-
-    MESSAGE = b"Hello, World!"
-    # print("UDP target IP: %s" % UDP_IP)
-    # print("UDP target port: %s" % UDP_PORT)
-    # print("message: %s" % MESSAGE)
-    sock = socket.socket(socket.AF_INET, # Internet
-                         socket.SOCK_DGRAM) # UDP
-    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-
 def sending_tcp_mess(TCP_IP, TCP_PORT):
-    # TCP_IP = "192.168.43.63"
-    # TCP_PORT = 5005
-    BUFFER_SIZE = 100000
+    BUFFER_SIZE = config.get_buffer_size()
     MESSAGE = "VintKahn\n".encode('utf_8')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((TCP_IP, TCP_PORT))
@@ -92,11 +78,9 @@ def sending_tcp_mess(TCP_IP, TCP_PORT):
             pass
     print(bcolors.F_Cyan + data.decode('utf_8'))
     val = input(bcolors.F_LightMagenta+"game start\n")
-    # socket_tcp.send(event.name.encode())
     s.send(val.encode('utf_8'))
     time.sleep(1)
     data = s.recv(BUFFER_SIZE)
     print(bcolors.F_LightYellow+"receiving data:", data.decode('utf_8'))
     s.close()
-    # socket_tcp = None
-    # time.sleep(2)
+
