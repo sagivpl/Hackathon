@@ -1,7 +1,8 @@
+import msvcrt
 import socket
 import struct
 import time
-import config
+from getch import _Getch
 
 
 class bcolors:
@@ -33,8 +34,9 @@ class bcolors:
     F_White = "\x1b[97m"
 
 def receving_udp_mess():
-    UDP_IP = config.get_udp_ip_client()
-    UDP_PORT = config.get_udp_port_client()
+    # UDP_IP = "192.168.1.23"
+    UDP_IP = "0.0.0.0"
+    UDP_PORT = 5005
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     sock.bind((UDP_IP, UDP_PORT))
     while True:
@@ -42,6 +44,7 @@ def receving_udp_mess():
         # data = data.decode('utf_8')
         if not (data[:4] == bytes([0xfe, 0xed, 0xbe, 0xef])) or not (data[4] == 0x02):
             print("Invalid format.")
+
         print("received message: %s" % data)
         ip_server = addr[0]
         port_server = struct.unpack('>H', data[5:7])[0]
@@ -49,18 +52,18 @@ def receving_udp_mess():
 
 
 
-# def sending_udp_mess(UDP_IP):
-#     # UDP_IP = "10.100.102.11"
-#     UDP_PORT = 5005
-#     #sending
-#
-#     MESSAGE = b"Hello, World!"
-#     # print("UDP target IP: %s" % UDP_IP)
-#     # print("UDP target port: %s" % UDP_PORT)
-#     # print("message: %s" % MESSAGE)
-#     sock = socket.socket(socket.AF_INET, # Internet
-#                          socket.SOCK_DGRAM) # UDP
-#     sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+def sending_udp_mess(UDP_IP):
+    # UDP_IP = "10.100.102.11"
+    UDP_PORT = 5005
+    #sending
+
+    MESSAGE = b"Hello, World!"
+    # print("UDP target IP: %s" % UDP_IP)
+    # print("UDP target port: %s" % UDP_PORT)
+    # print("message: %s" % MESSAGE)
+    sock = socket.socket(socket.AF_INET, # Internet
+                         socket.SOCK_DGRAM) # UDP
+    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
 def sending_tcp_mess(TCP_IP, TCP_PORT):
     # TCP_IP = "192.168.43.63"
@@ -72,6 +75,22 @@ def sending_tcp_mess(TCP_IP, TCP_PORT):
     s.send(MESSAGE)
     data = s.recv(BUFFER_SIZE)
     time.sleep(2)
+    #game mood
+    start_time = time.time()
+    while time.time() - start_time < 10:
+        s.send(_Getch())
+    data = s.recv(BUFFER_SIZE)
+    while True:
+        try:
+            if msvcrt.kbhit():
+              MESSAGE = _Getch()
+              s.send(MESSAGE)
+            data = s.recv(BUFFER_SIZE)
+            if len(data) == 0:
+                break
+            print(bcolors.F_Cyan + data.decode('utf_8'))
+        except:
+            pass
     print(bcolors.F_Cyan + data.decode('utf_8'))
     val = input(bcolors.F_LightMagenta+"game start\n")
     # socket_tcp.send(event.name.encode())
