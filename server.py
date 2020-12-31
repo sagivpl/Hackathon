@@ -93,7 +93,7 @@ import traceback
 import sys
 from socket import *
 import socket
-
+import config
 class group():
     group_name_dict = {}
     group_keyboard_dict = {}
@@ -193,21 +193,27 @@ def udp_thread_handler():
 
 
 def sending_udp_mess():
-    # UDP_IP = "10.100.102.4"
+    # UDP_IP = "192.168.1.23"
+    UDP_IP = config.get_udp_ip_server()
+    print('UDP_IP', UDP_IP)
     UDP_PORT = 5005
     #sending
     MESSAGE = ('0xfeedbeef'+'0x2'+str(UDP_PORT))
     MESSAGE = bytes(MESSAGE,'utf-8')
 
-    # sock = socket.socket(socket.AF_INET, # Internet
-    #                      socket.SOCK_DGRAM) # UDP
-    # sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    sock = socket.socket(socket.AF_INET, # Internet
+                         socket.SOCK_DGRAM) # UDP
+    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     try:
         cs.sendto(MESSAGE, ('255.255.255.255', UDP_PORT))
+        # sock = socket.socket(socket.AF_INET,  # Internet
+        #                      socket.SOCK_DGRAM)  # UDP
+        # sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+
     except:
         pass
 
